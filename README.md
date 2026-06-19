@@ -3,6 +3,8 @@
 Dashboard de monitoreo energético que expone datos del **Coordinador Eléctrico Nacional (CEN)** de Chile a través de una **API REST propia** desarrollada en PowerShell (framework Pode), consumida por un dashboard HTML + Chart.js.
 
 Muestra para el proyecto Quillagua (subestación Frontera 220 kV):
+⚠️ **Alcance del proyecto: solución local.** El backend (API REST propia) está diseñado para ejecutarse en local, según lo permitido por el enunciado. El dashboard también está publicado en GitHub Pages (enlace al final del README) para poder ver la interfaz sin instalar nada, **pero esa versión publicada no mostrará datos** a menos que el backend esté corriendo en la misma máquina desde la que se abre el link — apuntando el campo "URL del backend" a `http://localhost:8080`. Para ver el dashboard con datos reales, sigue la sección "Puesta en marcha" más abajo.
+
 - **Costo Marginal Online** (USD/MWh) — barra `FRONTERA______220`
 - **Inyección de Energía Activa** (kWh) — punto `FRONTERA_220_J7-J8_QUI`
 - **Retiro de Energía Activa** (kWh) — punto `FRONTERA_220_J7-J8_QUI`
