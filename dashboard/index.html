@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quillagua · Monitor CEN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  // Fallback: si el CDN principal fue bloqueado (p.ej. Tracking Prevention
+  // del navegador), intentar un segundo CDN antes de que la app falle.
+  if (typeof Chart === 'undefined') {
+    document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>');
+  }
+</script>
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+
+  <div class="grid-overlay" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="topbar__brand">
+      <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M28 4 L12 36 H26 L18 60 L52 28 H36 L44 4 Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+      </svg>
+      <div class="brand-text">
+        <span class="brand-text__main">QUILLAGUA</span>
+        <span class="brand-text__sub">Monitor de barra · Frontera 220&nbsp;kV</span>
+      </div>
+    </div>
+
+    <div class="topbar__status" id="connection-status">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="status-label">Sin conectar</span>
+    </div>
+  </header>
+
+  <div class="diagram-strip" aria-hidden="true">
+    <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+      <line x1="0" y1="30" x2="1200" y2="30" stroke="var(--line-color)" stroke-width="1.5" stroke-dasharray="2 10"/>
+      <g id="pulse-group"></g>
+    </svg>
+  </div>
+
+  <main class="layout">
+
+    <!-- ============ PANEL DE CONTROL ============ -->
+    <section class="control-panel">
+      <div class="field">
+        <label for="start-date">Desde</label>
+        <input type="date" id="start-date">
+      </div>
+      <div class="field">
+        <label for="end-date">Hasta</label>
+        <input type="date" id="end-date">
+      </div>
+      <div class="field field--key">
+        <label for="api-key">API Key propia</label>
+        <input type="password" id="api-key" placeholder="X-API-KEY del backend">
+      </div>
+      <div class="field field--url">
+        <label for="api-base-url">URL del backend</label>
+        <input type="text" id="api-base-url" value="http://localhost:8080">
+      </div>
+      <button id="btn-load" class="btn-primary">
+        <span>Cargar datos</span>
+      </button>
+    </section>
+
+    <p class="error-banner" id="error-banner" hidden></p>
+
+    <!-- ============ KPIs ============ -->
+    <section class="kpi-row">
+      <article class="kpi-card kpi-card--cmg">
+        <span class="kpi-card__label">Costo Marginal Online</span>
+        <span class="kpi-card__value" id="kpi-cmg">—</span>
+        <span class="kpi-card__unit">USD/MWh · Barra FRONTERA______220</span>
+      </article>
+      <article class="kpi-card kpi-card--iny">
+        <span class="kpi-card__label">Inyección Energía Activa</span>
+        <span class="kpi-card__value" id="kpi-iny">—</span>
+        <span class="kpi-card__unit">kWh · último registro</span>
+      </article>
+      <article class="kpi-card kpi-card--ret">
+        <span class="kpi-card__label">Retiro Energía Activa</span>
+        <span class="kpi-card__value" id="kpi-ret">—</span>
+        <span class="kpi-card__unit">kWh · último registro</span>
+      </article>
+    </section>
+
+    <!-- ============ GRAFICOS ============ -->
+    <section class="chart-grid">
+      <article class="chart-card chart-card--wide">
+        <header class="chart-card__header">
+          <h2>Costo Marginal Online</h2>
+          <span class="chart-card__hint">USD/MWh en el periodo seleccionado</span>
+        </header>
+        <div class="chart-card__body">
+          <canvas id="chart-cmg"></canvas>
+        </div>
+      </article>
+
+      <article class="chart-card chart-card--wide">
+        <header class="chart-card__header">
+          <h2>Inyección vs. Retiro de Energía Activa</h2>
+          <span class="chart-card__hint">kWh — punto de medida FRONTERA_220_J7-J8_QUI</span>
+        </header>
+        <div class="chart-card__body">
+          <canvas id="chart-medidas"></canvas>
+        </div>
+      </article>
+
+      <article class="chart-card">
+        <header class="chart-card__header">
+          <h2>Balance neto</h2>
+          <span class="chart-card__hint">Inyección − Retiro por registro</span>
+        </header>
+        <div class="chart-card__body">
+          <canvas id="chart-balance"></canvas>
+        </div>
+      </article>
+
+      <article class="chart-card">
+        <header class="chart-card__header">
+          <h2>Tabla de datos</h2>
+          <span class="chart-card__hint">Últimos 10 registros de costo marginal</span>
+        </header>
+        <div class="table-wrap">
+          <table id="data-table">
+            <thead>
+              <tr><th>Fecha</th><th>Hora</th><th>CMg (USD/MWh)</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+  </main>
+
+  <footer class="footer-note">
+    Datos obtenidos desde la API pública del Coordinador Eléctrico Nacional (CEN) de Chile,
+    vía API REST propia securizada. Proyecto académico — uso local.
+  </footer>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>

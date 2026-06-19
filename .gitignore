@@ -1,0 +1,10 @@
+# Variables de entorno con credenciales — NUNCA subir
+api/.env
+
+# PowerShell
+*.ps1xml
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
