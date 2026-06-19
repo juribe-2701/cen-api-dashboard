@@ -340,7 +340,38 @@ funciones `Get-CenCostoMarginal` / `Get-CenMedidas` dentro de
 
 ---
 
-## .gitignore
+## Despliegue del dashboard (enlace público)
+
+El dashboard está publicado vía GitHub Pages:
+
+**https://juribe-2701.github.io/cen-api-dashboard/dashboard/**
+
+> Esa URL sirve el HTML/CSS/JS del dashboard. Para que muestre datos reales,
+> el backend (`api/Start-CenApi.ps1`) debe estar corriendo (localmente, o en
+> algún servidor accesible) y el campo **URL del backend** en el dashboard
+> debe apuntar a esa dirección — por defecto trae `http://localhost:8080`,
+> válido solo si el backend corre en la misma máquina desde la que se abre
+> el dashboard.
+
+---
+
+## Pasos para subir el repositorio a GitHub
+
+```powershell
+cd C:\_NB-HOMY_JC\JC\PS\cen-api-dashboard
+git init
+git add .
+git status   # Verificar que api/.env NO aparece en la lista (debe estar ignorado)
+git commit -m "Quillagua Monitor CEN - API REST + Dashboard"
+git branch -M main
+git remote add origin https://github.com/TU-USUARIO/cen-api-dashboard.git
+git push -u origin main
+```
+
+Luego comparte la URL del repositorio (`https://github.com/TU-USUARIO/cen-api-dashboard`)
+con la persona de contacto del proceso antes del plazo indicado.
+
+---
 
 ```gitignore
 # Variables de entorno (NUNCA subir al repo)
